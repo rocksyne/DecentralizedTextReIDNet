@@ -53,4 +53,4 @@ class EfficientNetBackbone(nn.Module):
             features.append(x)
 
         features = [features[stage] for stage in self.stages_to_extract_from]
-        return features # eg. features from stages [1,3,5,7,9] according to table above
+        return features # eg. features from stages [3,5,7,9] according to table above
