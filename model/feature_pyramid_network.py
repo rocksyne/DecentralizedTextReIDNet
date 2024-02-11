@@ -38,8 +38,8 @@ class FeaturePyramidNetwork(nn.Module):
         
     def forward(self, stage_outputs_as_input:list[torch.Tensor]):
 
-        for aa in stage_outputs_as_input:
-            print(aa.shape)
+        if not isinstance(stage_outputs_as_input,list):
+            raise TypeError("`stage_outputs_as_input` must be a list and contain 4 elements.")
 
         S3_output, S5_output, S7_output, S9_output = stage_outputs_as_input
 
@@ -68,6 +68,7 @@ class FeaturePyramidNetwork(nn.Module):
         P_3 = upsampled_P_5 + P_3
         P_3 = self.conv3x3(P_3)
 
+        # print(" P_3:{}, P_5:{}, P_7:{}, P_9:{}".format( P_3.shape, P_5.shape, P_7.shape, P_9.shape))
         return P_3, P_5, P_7, P_9
 
 
