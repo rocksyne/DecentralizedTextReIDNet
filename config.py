@@ -9,13 +9,13 @@ import os
 import platform
 
 # 3rd party library
-from prettytable import PrettyTable
+# from prettytable import PrettyTable
 
 # Some global configurations
 PARENT_DIR = os.path.dirname(os.path.abspath(__file__))
-table = PrettyTable(['Configuration Parameter','Value'], hrules=1)
-table.align['Configuration Parameter'] = 'l' # Left-align column
-table.align['Value'] = 'l' # Left-align the column
+# table = PrettyTable(['Configuration Parameter','Value'], hrules=1)
+# table.align['Configuration Parameter'] = 'l' # Left-align column
+# table.align['Value'] = 'l' # Left-align the column
 
 
 class DotDict(dict):
@@ -129,13 +129,13 @@ def sys_configuration(platform_name:str=platform.node(), dataset_name:str="CUHK-
         configs['CUHK_PEDES_dataset_parent_dir']:str = "/home/users/roagyeman/research/datasets/CUHK-PEDES"
         configs['MHPv2_dataset_parent_dir']:str = "/home/users/roagyeman/research/datasets/LV-MHP-v2"
         configs['num_workers']:int = 16 # Use x CPU cores max
-        configs['batch_size']:int = 32 # Self explanatory, but use x batches
+        configs['batch_size']:int = 10 # Self explanatory, but use x batches
         
     elif platform_name == 'deeplearning': # Development server
         configs['CUHK_PEDES_dataset_parent_dir']:str = "/media/rockson/Data_drive/datasets/CUHK-PEDES"
         configs['MHPv2_dataset_parent_dir']:str = "/media/rockson/Data_drive/datasets/LV-MHP-v2-bkup" # parent dir of the dataset
         configs['num_workers']:int = 6 # Use x CPU cores max
-        configs['batch_size']:int = 1 # Self explanatory, but use x batches
+        configs['batch_size']:int = 10 # Self explanatory, but use x batches
 
     elif platform_name == 'ultron': # Other dedicated simulation server
         # configs['CUHK_PEDES_dataset_parent_dir']:str = "/datasets/CUHK-PEDES"
@@ -173,9 +173,9 @@ def sys_configuration(platform_name:str=platform.node(), dataset_name:str="CUHK-
     # +++++++++++++++++++++++++++++++++++++++++++++++++++
     # ++++++++++++++++[Debug Info Matters]+++++++++++++++
     # +++++++++++++++++++++++++++++++++++++++++++++++++++
-    if show_configs:
-        for key, value in configs.items():
-            table.add_row([key, value])
-        print(table)
+    # if show_configs:
+    #     for key, value in configs.items():
+    #         table.add_row([key, value])
+    #     print(table)
 
     return DotDict(configs)
