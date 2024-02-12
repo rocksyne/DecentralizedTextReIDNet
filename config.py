@@ -1,5 +1,5 @@
 """
-ⓒ January 2023
+ⓒ February 2023
 Doc: Codebase configuration file.
 License: Please see license file for details.
 """
@@ -81,7 +81,9 @@ def sys_configuration(platform_name:str=platform.node(), dataset_name:str="CUHK-
     # +++++++++++++++++++++++++++++++++++++++++++++++++++
     # +++++++++++++[visual model configuration]++++++++++
     # +++++++++++++++++++++++++++++++++++++++++++++++++++
-    configs["image_size"]:tuple[int,int] = (384, 128) # (H,W)
+    configs["CUHKPEDES_image_size"]:tuple[int,int] = (384, 128) # (H,W)
+    configs["MHPV2_image_size"]:tuple[int,int] = (473, 473) # (H,W) - https://github.com/liutinglt/CE2P/blob/master/dataset/datasets.py
+                                                            # I think I will revert to (512,512) https://github.com/rocksyne/MHParsNet
 
 
     # +++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -94,8 +96,7 @@ def sys_configuration(platform_name:str=platform.node(), dataset_name:str="CUHK-
     configs['lr']:float = 0.001 # The initial learning rate
     configs['patience']:int = 3 # How many more epochs to train for after a metric fails to improve
     configs["val_dataset"]:str = "test" # Choose which dataset split to use for vaildation / evaluation. Values: `test` or `val`
-    configs['device']:str  = "cuda" # If `cuda`, just use GPU ID 0 on all systems. Model is small anyway
-    configs['progress_bar_width']:int = 200 # How long progress bar should be.
+    configs['device']:str  = "cuda" # If `cuda`, just use GPU ID 0 on all systems. Model is small anywa
     configs['seed']:int = 3407 # The seed for results reproduction
     configs['model_testing_data_split']:str = 'test' # The split of the dataset to use for testing. Values are `test` and `val`
     configs['save_best_test_results_only']:bool = True # Save the best test resuls or all results
@@ -125,22 +126,22 @@ def sys_configuration(platform_name:str=platform.node(), dataset_name:str="CUHK-
     # +++++++++[Platform Specific Configurations]++++++++
     # +++++++++++++++++++++++++++++++++++++++++++++++++++
     if platform_name == 'PC-SIM': # PC dedicated simulation server
-        configs['CUHK_PEDES_dataset_parent_dir']:str = "/home/users/roagyeman/research/datasets/CUHK-PEDES" # parent dir of the dataset
-        configs['RSTPReid_dataset_parent_dir']:str = None # TODO complete it
-        configs['num_workers']:int =  16 # Use x CPU cores max
-        configs['batch_size']:int = 3 # Self explanatory, but use x batches
+        configs['CUHK_PEDES_dataset_parent_dir']:str = "/home/users/roagyeman/research/datasets/CUHK-PEDES"
+        configs['MHPv2_dataset_parent_dir']:str = "/home/users/roagyeman/research/datasets/LV-MHP-v2"
+        configs['num_workers']:int = 16 # Use x CPU cores max
+        configs['batch_size']:int = 32 # Self explanatory, but use x batches
         
     elif platform_name == 'deeplearning': # Development server
         configs['CUHK_PEDES_dataset_parent_dir']:str = "/media/rockson/Data_drive/datasets/CUHK-PEDES"
-        configs['RSTPReid_dataset_parent_dir']:str = None # TODO complete it
+        configs['MHPv2_dataset_parent_dir']:str = "/media/rockson/Data_drive/datasets/LV-MHP-v2-bkup" # parent dir of the dataset
         configs['num_workers']:int = 6 # Use x CPU cores max
         configs['batch_size']:int = 1 # Self explanatory, but use x batches
 
     elif platform_name == 'ultron': # Other dedicated simulation server
-        configs['CUHK_PEDES_dataset_parent_dir']:str = "/datasets/CUHK-PEDES"
-        configs['RSTPReid_dataset_parent_dir']:str = None # TODO complete it
-        configs['num_workers'] = 6 # Use 6 CPU cores max
-        configs['batch_size']:int = 16 # Self explanatory, but use x batches
+        # configs['CUHK_PEDES_dataset_parent_dir']:str = "/datasets/CUHK-PEDES"
+        # configs['num_workers'] = 6 # Use 6 CPU cores max
+        # configs['batch_size']:int = 16 # Self explanatory, but use x batches
+        ... # TODO
     
     elif platform_name == 'nano':
         ... # pass TODO: add nano specif configurations if needed
