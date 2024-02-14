@@ -84,6 +84,8 @@ def sys_configuration(platform_name:str=platform.node(), dataset_name:str="CUHK-
     configs["CUHKPEDES_image_size"]:tuple[int,int] = (384, 128) # (H,W)
     configs["MHPV2_image_size"]:tuple[int,int] = (473, 473) # (H,W) - https://github.com/liutinglt/CE2P/blob/master/dataset/datasets.py
                                                             # I think I will revert to (512,512) https://github.com/rocksyne/MHParsNet
+    configs['MHPV2_means']:list[float] = [0.3555248975753784, 0.3295726776123047, 0.3115333914756775]
+    configs['MHPV2_stds']:list[float] = [0.3482806384563446, 0.3339986503124237, 0.3296058773994446]
 
 
     # +++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -129,7 +131,7 @@ def sys_configuration(platform_name:str=platform.node(), dataset_name:str="CUHK-
         configs['CUHK_PEDES_dataset_parent_dir']:str = "/home/users/roagyeman/research/datasets/CUHK-PEDES"
         configs['MHPv2_dataset_parent_dir']:str = "/home/users/roagyeman/research/datasets/LV-MHP-v2"
         configs['num_workers']:int = 16 # Use x CPU cores max
-        configs['batch_size']:int = 10 # Self explanatory, but use x batches
+        configs['batch_size']:int = 32 # Self explanatory, but use x batches
         
     elif platform_name == 'deeplearning': # Development server
         configs['CUHK_PEDES_dataset_parent_dir']:str = "/media/rockson/Data_drive/datasets/CUHK-PEDES"

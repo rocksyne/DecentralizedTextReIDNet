@@ -191,10 +191,6 @@ def get_human_instance_masks_and_BBs_with_classes(segmentation: torch.Tensor = N
 
 
 
-
-
-
-
 def clip_boxes(boxes, hw):
     """
     Clip (limit) the values in a bounding box array. Given an interval, values outside the
@@ -220,71 +216,7 @@ def normalize_BB_to_01(bounding_boxes, image_dimension):
     return bounding_boxes
 
 
-def get_timestamp_as_str():
-    "get date and time as string for model name "
-    current_datetime = datetime.datetime.now()
-    current_date = current_datetime.strftime("%Y-%m-%d %H:%M:%S")
-    current_date = current_date.replace("-", "")
-    current_date = current_date.replace(" ", "_")
-    current_date = current_date.replace(":", "")
-    return str(current_date)
 
-
-def generate_norm_file(list_of_dictionaries: torch.Tensor, save_dir: str = "./"):
-    """
-    Args.:  <list>list_of_dictionaries: list of dictionary objects that contain image tensors. 
-                                                                            Then key to the image tensors is `images`,
-                                                                            and each tensor must be of shape [3,H,W]
-                    <str>:save_dir: directory to where json file should be saved
-    """
-    if len(list_of_dictionaries) < 1:
-        raise Exception("No list availabe")
-
-    mean_R, mean_G, mean_B = [], [], []
-    std_R, std_G, std_B = [], [], []
-
-    for data in tqdm(list_of_dictionaries):
-        images = data["images"]
-        images = images.squeeze()
-        r = images[0, :, :].type(torch.float32)
-        g = images[1, :, :].type(torch.float32)
-        b = images[2, :, :].type(torch.float32)
-
-        # all means
-        mean_R.append(torch.mean(r).item())
-        mean_G.append(torch.mean(g).item())
-        mean_B.append(torch.mean(b).item())
-
-        # all stds
-        std_R.append(torch.std(r).item())
-        std_G.append(torch.std(g).item())
-        std_B.append(torch.std(b).item())
-
-    data = {"means": [mean(mean_R), mean(mean_G), mean(mean_B)],
-            "stds": [mean(std_R), mean(std_G), mean(std_B)]}
-
-    file_name = os.path.join(save_dir, "norm_file.json")
-    with open(file_name, "w+") as fp:
-        json.dump(data, fp)
-    print("Normalization file saved to ", file_name)
-
-
-def get_norm_values_from_file(file_path: str = "normal_file.json"):
-
-    if not os.path.exists(file_path):
-        raise ValueError("Invalid file path: " + file_path)
-
-    with open(file_path, "r") as fp:
-        data = json.load(fp)
-
-    return data
-
-
-def unnormalize_image(image, mean, std):
-    image = image.transpose(1, 2, 0)
-    image = (image * std) + mean
-    image = image.transpose(2, 0, 1)
-    return image
 
 
 def masks_to_boxes(masks: torch.Tensor) -> torch.Tensor:
@@ -319,7 +251,9 @@ def masks_to_boxes(masks: torch.Tensor) -> torch.Tensor:
 
 
 
-
+# =========================================================================
+# ========================[ Class Utilities ]==============================
+# =========================================================================
 class CustomMHPv2ImageResizer(object):
     def __init__(self, dimensions:tuple=(512, 512), image_type:str='RGB'):
         """

@@ -36,7 +36,8 @@ class MHPv2(Dataset):
 
     def __init__(self,
                  config:dict=None,
-                 dataset_split: str = "train"):
+                 dataset_split: str = "train",
+                 do_transfrom:bool = True):
         """
         Prepare the MHPv2 dataset for training and inference. 
 
@@ -80,6 +81,7 @@ class MHPv2(Dataset):
         """
         self.config = config
         self.dataset_split = dataset_split
+        self.do_transfrom = do_transfrom
         self.dataset_parent_dir = self.config.MHPv2_dataset_parent_dir
         self.allowed_dataset_split = ["train", "val"]
         self.part_classes = ["Cap/hat", "Helmet", "Face", "Hair", "Left-arm", "Right-arm", "Left-hand", "Right-hand",
@@ -99,7 +101,7 @@ class MHPv2(Dataset):
 
         self.rgb_img_resizer = CustomMHPv2ImageResizer(dimensions=config.MHPV2_image_size, image_type='RGB')
         self.greyscale_img_resizer = CustomMHPv2ImageResizer(dimensions=config.MHPV2_image_size, image_type='L')
-        self.transform = transforms.ToTensor()
+        self.transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize(mean=config.MHPV2_means,std=config.MHPV2_stds)])
 
         # get all essenstial directories
         self.data_id_file = os.path.join(self.dataset_parent_dir, "list", self.dataset_split+".txt")
@@ -133,7 +135,12 @@ class MHPv2(Dataset):
         img_path = os.path.join(self.image_dir,str(self.data_ids[idx])+".jpg")
         img = read_image(img_path,'RGB')
         img = self.rgb_img_resizer(img)
-        img = self.transform(img)
+
+        if self.do_transfrom:
+            img = self.transform(img)
+        
+        else: # just convert to tensor
+            img = transforms.ToTensor()(img)
 
         # masks and bounding boxes for semantic person segmentation
         human_seg_annot_path = os.path.join(self.human_ids_dir,str(self.data_ids[idx])+".png")

@@ -24,7 +24,7 @@ class DecentralizedTextReIDNet(nn.Module):
         self.configs:dict = configs
         self.efficientnet_backbone = EfficientNetBackbone()
         self.FPN = FeaturePyramidNetwork()
-        self.language_network = GRULanguageNetwork(configs)
+        # self.language_network = GRULanguageNetwork(configs)
 
     def forward(self,image):
         ...
