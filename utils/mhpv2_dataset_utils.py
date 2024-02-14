@@ -15,6 +15,10 @@ from torch.nn.utils import clip_grad
 from scipy import ndimage
 
 
+
+# =========================================================================
+# ===================[ Function Based Utilities ]==========================
+# =========================================================================
 def get_part_instance_masks_and_BBs_with_classes(segmentation: torch.Tensor = None,
                                                  smallest_bb_area: int = 10,
                                                  helper_data: dict = None,
@@ -28,6 +32,7 @@ def get_part_instance_masks_and_BBs_with_classes(segmentation: torch.Tensor = No
                     <str>segmentation_path: name of the segmentation image for debugging purposes
 
     Return: <dict> `instance_ids`, `instance_masks`, and `bounding_boxes_n_classes`
+    TODO: Take care of person class indexing
     """
     # security checkpoint - you shall not pass hahahahaha
     if not isinstance(segmentation, torch.Tensor):
@@ -173,7 +178,6 @@ def get_human_instance_masks_and_BBs_with_classes(segmentation: torch.Tensor = N
                                                                       class_list, 
                                                                       human_id_list, 
                                                                       smallest_bb_area)
-
     # create a canvas for bounding boxes.
     # The shape of this canvas is (num_boxes,6),
     # where 5 represents (x1, y1, x2, y2,object_or_class_ID,human_id)
@@ -186,9 +190,7 @@ def get_human_instance_masks_and_BBs_with_classes(segmentation: torch.Tensor = N
     # # that have been removed.
     # instance_masks = merge_masks_with_instances(mask_list,class_list) # dim = (H,W)
     # instance_masks = instance_masks[None,:,:] # expand dimension to become (C,H,W)
-
     return mask_list, bounding_boxes
-
 
 
 def clip_boxes(boxes, hw):
@@ -214,9 +216,6 @@ def normalize_BB_to_01(bounding_boxes, image_dimension):
     bounding_boxes[:, [0, 2]] = torch.div(bounding_boxes[:, [0, 2]], w)
     bounding_boxes[:, [1, 3]] = torch.div(bounding_boxes[:, [1, 3]], h)
     return bounding_boxes
-
-
-
 
 
 def masks_to_boxes(masks: torch.Tensor) -> torch.Tensor:
@@ -250,9 +249,41 @@ def masks_to_boxes(masks: torch.Tensor) -> torch.Tensor:
     return bounding_boxes
 
 
+def clean_data_recieved_from_collator(bbs_n_labels:None,instance_masks:None):
+
+	if bbs_n_labels.shape[0] != instance_masks.shape[0]:
+		raise ValueError("Invalid parameters for either `bbs_n_labels` or `instance_masks`")
+
+	fetched_batch = bbs_n_labels.shape[0]
+	gt_bboxes = []
+	gt_labels = []
+	gt_masks = []
+	for idx in range(fetched_batch):
+		current_bbs_n_labels = bbs_n_labels[idx, :, :]
+		current_bbs_n_labels = current_bbs_n_labels[current_bbs_n_labels[:, -1] != -1] # remove all negative vaulues that were used for padding
+		
+		# prepare gt bounding boxes
+		bbox = current_bbs_n_labels[:,:4]
+		gt_bboxes.append(bbox)
+
+		# prepare gt labels
+		label = current_bbs_n_labels[:,4].long()
+		num_valid_labels = label.shape[0]
+		gt_labels.append(label)
+
+		# prepare GT masks
+		# lets simply use the number of labels to fetch the number of valid masks
+		# remember we have some labels that have -1 values for collation padding purposes
+		masks = instance_masks[idx]
+		masks = masks[:num_valid_labels,:,:] # fetch only valid masks. All arrays with -1 values are removed
+		masks = masks.to(torch.uint8)
+		gt_masks.append(masks)
+	
+	return gt_bboxes, gt_masks, gt_labels
+
 
 # =========================================================================
-# ========================[ Class Utilities ]==============================
+# =======================[ Class Based Utilities ]=========================
 # =========================================================================
 class CustomMHPv2ImageResizer(object):
     def __init__(self, dimensions:tuple=(512, 512), image_type:str='RGB'):
