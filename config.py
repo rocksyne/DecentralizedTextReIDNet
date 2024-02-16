@@ -89,6 +89,21 @@ def sys_configuration(platform_name:str=platform.node(), dataset_name:str="CUHK-
 
 
     # +++++++++++++++++++++++++++++++++++++++++++++++++++
+    # ++++++++[Human Parsing Model Configurations]++++++++
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++
+    configs['score_thr'] = 0
+    configs['mask_thr'] = 0
+    configs['nms_pre'] = 0
+    configs['kernel'] = 0
+    configs['sigma'] = 0
+    configs['update_thr'] = 0
+    configs['max_per_img'] = 0
+
+
+
+
+
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++
     # +++++++++++++[Training configurations]+++++++++++++
     # +++++++++++++++++++++++++++++++++++++++++++++++++++
     configs['epoch']:int = 60# The umber of epochs for which model should be trained
@@ -131,7 +146,7 @@ def sys_configuration(platform_name:str=platform.node(), dataset_name:str="CUHK-
         configs['CUHK_PEDES_dataset_parent_dir']:str = "/home/users/roagyeman/research/datasets/CUHK-PEDES"
         configs['MHPv2_dataset_parent_dir']:str = "/home/users/roagyeman/research/datasets/LV-MHP-v2"
         configs['num_workers']:int = 16 # Use x CPU cores max
-        configs['batch_size']:int = 4 # Self explanatory, but use x batches
+        configs['batch_size']:int = 8 # Self explanatory, but use x batches
         
     elif platform_name == 'deeplearning': # Development server
         configs['CUHK_PEDES_dataset_parent_dir']:str = "/media/rockson/Data_drive/datasets/CUHK-PEDES"

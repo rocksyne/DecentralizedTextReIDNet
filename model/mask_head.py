@@ -48,10 +48,8 @@ class MaskFeatHead(nn.Module):
                         nn.GroupNorm(num_channels=self.out_channels, num_groups=32),
                         nn.ReLU(inplace=True))
                     convs_per_level.add_module('conv' + str(j), one_conv)
-                    one_upsample = nn.Upsample(
-                        scale_factor=2, mode='bilinear', align_corners=False)
-                    convs_per_level.add_module(
-                        'upsample' + str(j), one_upsample)
+                    one_upsample = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=False)
+                    convs_per_level.add_module('upsample' + str(j), one_upsample)
                     continue
 
                 one_conv = nn.Sequential(DepthwiseSeparableConv2d(self.out_channels, self.out_channels, 3, stride=1, padding=1, bias=False),

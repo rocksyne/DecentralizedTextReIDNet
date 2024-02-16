@@ -8,7 +8,7 @@ from model.model_utils import DepthwiseSeparableConv2d
 
 
 class FeaturePyramidNetwork(nn.Module):
-    def __init__(self, out_channels_per_stage_level: list[int] = [24, 80, 192, 1280], feature_size: int = 512) -> list[torch.tensor]:
+    def __init__(self, out_channels_per_stage_level: list[int] = [24, 80, 192, 1280], feature_size: int = 256) -> list[torch.tensor]:
         """
         Doc.:   Feature Pyramid Network (FPN) for building a rich multi-scale feature hierarchy 
                 for person detection and segmentation. See https://arxiv.org/pdf/1612.03144.pdf.
@@ -23,14 +23,10 @@ class FeaturePyramidNetwork(nn.Module):
         S3_channels, S5_channels, S7_channels, S9_channels = out_channels_per_stage_level
 
         # 1x1 convolutions fro the lateral outputs
-        self.S3_lateral_1x1_conv = nn.Conv2d(
-            in_channels=S3_channels, out_channels=feature_size, kernel_size=1)
-        self.S5_lateral_1x1_conv = nn.Conv2d(
-            in_channels=S5_channels, out_channels=feature_size, kernel_size=1)
-        self.S7_lateral_1x1_conv = nn.Conv2d(
-            in_channels=S7_channels, out_channels=feature_size, kernel_size=1)
-        self.S9_lateral_1x1_conv = nn.Conv2d(
-            in_channels=S9_channels, out_channels=feature_size, kernel_size=1)
+        self.S3_lateral_1x1_conv = nn.Conv2d(in_channels=S3_channels, out_channels=feature_size, kernel_size=1)
+        self.S5_lateral_1x1_conv = nn.Conv2d(in_channels=S5_channels, out_channels=feature_size, kernel_size=1)
+        self.S7_lateral_1x1_conv = nn.Conv2d(in_channels=S7_channels, out_channels=feature_size, kernel_size=1)
+        self.S9_lateral_1x1_conv = nn.Conv2d(in_channels=S9_channels, out_channels=feature_size, kernel_size=1)
 
         # upsampling method for top-down layers
         self._2x_upsample = nn.Upsample(scale_factor=2, mode='bilinear')
@@ -86,6 +82,21 @@ class FeaturePyramidNetwork(nn.Module):
         upsampled_P_5 = self._4x_upsample(P_5)
         P_3 = upsampled_P_5 + P_3
         P_3 = self.conv3x3(P_3)
+
+        """
+        The shapes using (3x512x512) image shape is 
+        P_3 = torch.Size([N, C, 128, 128])
+        P_5 = torch.Size([N, C, 32, 32])
+        P_7 = torch.Size([N, C, 16, 16])
+        P_9 = torch.Size([N, C, 16, 16])
+        P_10 = torch.Size([N, C, 8, 8])
+
+        As seen above, P_5 is 4 times smaller than P_3. I'd sort of prefer 2x smaller.
+        If we upsample P_5 to torch.Size([N, C, 64, 64]), then P_7 at torch.Size([N, C, 16, 16])
+        would also be 4x smaller instead of 2x. So and adhoc solution is to upscale P_5 and P_7.
+        """
+        P_5 = self._2x_upsample(P_5)
+        P_7 = self._2x_upsample(P_7)
 
         # print(" P_3:{}, P_5:{}, P_7:{}, P_9:{}".format( P_3.shape, P_5.shape, P_7.shape, P_9.shape))
         return P_3, P_5, P_7, P_9, P_10
