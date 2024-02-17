@@ -21,7 +21,7 @@ def build_mhpv2_dataloader(config:dict=None):
     train_set = MHPv2(config=config, dataset_split='train')
     train_set_loader = DataLoader(train_set,
                                    batch_size=config.batch_size,
-                                   shuffle=True,
+                                   shuffle=False,
                                    num_workers=config.num_workers,
                                    collate_fn=mhpv2_collate)
     
@@ -29,7 +29,7 @@ def build_mhpv2_dataloader(config:dict=None):
     val_set = MHPv2(config=config, dataset_split='val')
     val_set_loader = DataLoader(val_set,
                                    batch_size=config.batch_size,
-                                   shuffle=True,
+                                   shuffle=False,
                                    num_workers=config.num_workers,
                                    collate_fn=mhpv2_collate)
     

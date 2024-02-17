@@ -249,7 +249,7 @@ def masks_to_boxes(masks: torch.Tensor) -> torch.Tensor:
     return bounding_boxes
 
 
-def clean_data_recieved_from_collator(bbs_n_labels:None,instance_masks:None):
+def clean_data_recieved_from_collator(bbs_n_labels:None,instance_masks:None,config:None):
 
 	if bbs_n_labels.shape[0] != instance_masks.shape[0]:
 		raise ValueError("Invalid parameters for either `bbs_n_labels` or `instance_masks`")
@@ -264,19 +264,19 @@ def clean_data_recieved_from_collator(bbs_n_labels:None,instance_masks:None):
 		
 		# prepare gt bounding boxes
 		bbox = current_bbs_n_labels[:,:4]
-		gt_bboxes.append(bbox)
+		gt_bboxes.append(bbox.to(config.device))
 
 		# prepare gt labels
 		label = current_bbs_n_labels[:,4].long()
 		num_valid_labels = label.shape[0]
-		gt_labels.append(label)
+		gt_labels.append(label.to(config.device))
 
 		# prepare GT masks
 		# lets simply use the number of labels to fetch the number of valid masks
 		# remember we have some labels that have -1 values for collation padding purposes
 		masks = instance_masks[idx]
 		masks = masks[:num_valid_labels,:,:] # fetch only valid masks. All arrays with -1 values are removed
-		masks = masks.to(torch.uint8)
+		masks = masks.numpy().astype(np.uint8)
 		gt_masks.append(masks)
 	
 	return gt_bboxes, gt_masks, gt_labels

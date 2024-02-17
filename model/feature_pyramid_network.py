@@ -57,31 +57,31 @@ class FeaturePyramidNetwork(nn.Module):
         # For the pyramid, we shall do top to bottom, so we start with stage 9.
         # Lets call the pyramid output as P_x, where x is the stage number
         # Do P_10. P_10 is just 3x3 convolution on S9_output
-        P_10 = self.P_10_conv(S9_output)
+        P_10 = self.P_10_conv(S9_output.to(torch.float32)).to(torch.float32)
 
         # Stage 9 pyramid
-        P_9 = self.S9_lateral_1x1_conv(S9_output)
-        P_9 = self.conv3x3(P_9)
+        P_9 = self.S9_lateral_1x1_conv(S9_output.to(torch.float32))
+        P_9 = self.conv3x3(P_9.to(torch.float32)).to(torch.float32)
 
         # Since stage 7 and 9 have the same spatial, that is HxW
         # dimensions, there is no need for feature upsampling.
-        P_7 = self.S7_lateral_1x1_conv(S7_output)
+        P_7 = self.S7_lateral_1x1_conv(S7_output.to(torch.float32))
         P_7 = P_9 + P_7
-        P_7 = self.conv3x3(P_7)
+        P_7 = self.conv3x3(P_7.to(torch.float32)).to(torch.float32)
 
         # Remember to upsample P_7 to increase the spatial dimension, so
         # that the the spatial dimension will be compactible with lateral P_5
-        P_5 = self.S5_lateral_1x1_conv(S5_output)
-        upsampled_P_7 = self._2x_upsample(P_7)
+        P_5 = self.S5_lateral_1x1_conv(S5_output.to(torch.float32))
+        upsampled_P_7 = self._2x_upsample(P_7.to(torch.float32))
         P_5 = upsampled_P_7 + P_5
-        P_5 = self.conv3x3(P_5)
+        P_5 = self.conv3x3(P_5.to(torch.float32)).to(torch.float32)
 
         # Upsample P_5 to increase the spatial dimension, so
         # that the the spatial dimension will be compactible with lateral P_3
-        P_3 = self.S3_lateral_1x1_conv(S3_output)
-        upsampled_P_5 = self._4x_upsample(P_5)
+        P_3 = self.S3_lateral_1x1_conv(S3_output.to(torch.float32))
+        upsampled_P_5 = self._4x_upsample(P_5.to(torch.float32))
         P_3 = upsampled_P_5 + P_3
-        P_3 = self.conv3x3(P_3)
+        P_3 = self.conv3x3(P_3.to(torch.float32)).to(torch.float32)
 
         """
         The shapes using (3x512x512) image shape is 
@@ -95,8 +95,8 @@ class FeaturePyramidNetwork(nn.Module):
         If we upsample P_5 to torch.Size([N, C, 64, 64]), then P_7 at torch.Size([N, C, 16, 16])
         would also be 4x smaller instead of 2x. So and adhoc solution is to upscale P_5 and P_7.
         """
-        P_5 = self._2x_upsample(P_5)
-        P_7 = self._2x_upsample(P_7)
+        P_5 = self._2x_upsample(P_5.to(torch.float32))
+        P_7 = self._2x_upsample(P_7.to(torch.float32))
 
         # print(" P_3:{}, P_5:{}, P_7:{}, P_9:{}".format( P_3.shape, P_5.shape, P_7.shape, P_9.shape))
         return P_3, P_5, P_7, P_9, P_10

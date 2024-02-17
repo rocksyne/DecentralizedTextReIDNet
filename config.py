@@ -91,13 +91,13 @@ def sys_configuration(platform_name:str=platform.node(), dataset_name:str="CUHK-
     # +++++++++++++++++++++++++++++++++++++++++++++++++++
     # ++++++++[Human Parsing Model Configurations]++++++++
     # +++++++++++++++++++++++++++++++++++++++++++++++++++
-    configs['score_thr'] = 0
-    configs['mask_thr'] = 0
-    configs['nms_pre'] = 0
-    configs['kernel'] = 0
-    configs['sigma'] = 0
-    configs['update_thr'] = 0
-    configs['max_per_img'] = 0
+    configs['nms_pre']:int = 500
+    configs['score_thr']:float = 0.1
+    configs['mask_thr']:float = 0.5
+    configs['update_thr']:float = 0.05
+    configs['kernel']:str = 'gaussian',  # values: `gaussian` or `linear`
+    configs['sigma']:float = 2.0
+    configs['max_per_img']:int = 30
 
 
 

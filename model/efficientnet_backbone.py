@@ -47,10 +47,11 @@ class EfficientNetBackbone(nn.Module):
         self.feature_blocks = self.model.features
 
     def forward(self, x):
+
         features = []
         for block in self.feature_blocks:
-            x = block(x)
-            features.append(x)
+            x = block(x.to(torch.float32))
+            features.append(x.to(torch.float32))
 
         features = [features[stage] for stage in self.stages_to_extract_from]
         return features # eg. features from stages [3,5,7,9] according to table above
