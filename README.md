@@ -4,3 +4,5 @@ This is the code repository for the paper titled "Decentralized Text-Based Perso
 Code will public after the acceptance of the paper. 
 
 Please contact the corresponding author, Bernhard Rinner (e-mail: bernhard.rinner@aau.at), for code related inquires.
+
+Thank you.
