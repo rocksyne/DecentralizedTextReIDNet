@@ -11,7 +11,7 @@ The screenshot of the prototype system (user application). The typos are deliber
 
 
 &nbsp;
-## Requirements (dependencies)
+## Software Dependencies
 ### For Computer (Application Server) 
 - Operating System: Ubuntu 20.04.6 LTS (irrelevant but worth mentioning)
 - CUDA Version: 12.4
@@ -25,8 +25,7 @@ The screenshot of the prototype system (user application). The typos are deliber
 - natsort version: 8.4.0
 - The remaining requirements are specified in [requirements.txt](requirements.txt)
 
-## For Nvidia Jetson Nano
-Download and use the [Ubuntu 20.04 OS image](https://github.com/Qengineering/Jetson-Nano-Ubuntu-20-image) from [Qengineering](https://github.com/Qengineering/Jetson-Nano-Ubuntu-20-image) to setup the operating system on the Jetson Nano device. The libraries provided by the Ubuntu 20.04 OS image should be sufficient, but where neccessary [install the dependencies](requirements.txt). The OS image comes pre-installed with the following:
+### For Nvidia Jetson Nano
 - OpenCV 4.8.0
 - Pytorch 1.13.0
 - TorchVision 0.14.0
@@ -34,10 +33,33 @@ Download and use the [Ubuntu 20.04 OS image](https://github.com/Qengineering/Jet
 
 
 &nbsp;
-## Setup (dependencies)
-## For Computer (Application Server) 
+## System Setup
+### For GPU Computer (Application Server) 
 - Install dependencies. Complete list of dependencies is in ```environment.yaml```
 - Download or clone DecentralizedTextReIDNet repository
 - Navigate into DecentralizedTextReIDNet directory: ```cd /path/to/DecentralizedTextReIDNet```
 - Download the [data](https://drive.google.com/drive/folders/1vGMhKj2hf_Kw286zi_exzX2FMTsISC9E?usp=sharing) folder and place it into as ```DecentralizedTextReIDNet/data```
 - Read and modify the ```config.py``` file in ```DecentralizedTextReIDNet/config.py``` to suit your system resources and requirements
+
+### For Camera Node (NVIDIA Jetson Nano) 
+- Download and use the [Ubuntu 20.04 OS image](https://github.com/Qengineering/Jetson-Nano-Ubuntu-20-image) from [Qengineering](https://github.com/Qengineering/Jetson-Nano-Ubuntu-20-image) to setup the operating system on the Jetson Nano device. The libraries provided by the Ubuntu 20.04 OS image should be sufficient, but where neccessary [install the dependencies](environment.yml).
+- Download or clone DecentralizedTextReIDNet repository
+- Navigate into DecentralizedTextReIDNet directory: ```cd /path/to/DecentralizedTextReIDNet```
+- Download the [data](https://drive.google.com/drive/folders/1vGMhKj2hf_Kw286zi_exzX2FMTsISC9E?usp=sharing) folder and place it into DecentralizedTextReIDNet as ```DecentralizedTextReIDNet/data```
+- Read and modify the ```config.py``` file in ```DecentralizedTextReIDNet/config.py``` to suit your system resources and requirements
+
+
+&nbsp;
+## Inference
+### On GPU Compuer (Application Server) 
+- Do person identification on cropped images in a directory: <br> 
+run ```python do_reid_on_cropped_person_images_in_directory.py```
+
+- Do person identification on multi-person image: <br> 
+run ```python do_reid_on_saved_multi_person_image.py```
+
+- Do person identification on saved pedestrian video: <br> 
+run ```python do_reid_on_saved_pedistrian_video.py```
+
+- Do person detection on multi-person image: <br> 
+run ```python human_detection_inference.py```
