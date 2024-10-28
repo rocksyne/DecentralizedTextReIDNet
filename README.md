@@ -16,8 +16,8 @@ The screenshot of the prototype system (user application). The typos are deliber
 - Operating System: Ubuntu 20.04.6 LTS (irrelevant but worth mentioning)
 - CUDA Version: 12.4
 - python version: 3.8.10
-- pytorch version: 1.13.1+cu117
-- torchvision version: 0.14.1+cu117
+- pytorch version: 1.13.1
+- torchvision version: 0.14.1
 - pillow version: 9.5.0
 - opencv-python version: 4.8.1.78
 - tqdm version: 4.66.1
@@ -36,8 +36,8 @@ Download and use the [Ubuntu 20.04 OS image](https://github.com/Qengineering/Jet
 &nbsp;
 ## Setup (dependencies)
 ## For Computer (Application Server) 
-- Install dependencies. Complete list of dependencies is in ```requirements.txt```
+- Install dependencies. Complete list of dependencies is in ```environment.yaml```
 - Download or clone DecentralizedTextReIDNet repository
-- Navigate into TextReIDNet directory: ```cd /path/to/TextReIDNet```
-- Download the pre-trained model [TextReIDNet_State_Dicts.pth.tar](https://drive.google.com/file/d/1iGRlscz0Vev_fDLswj_yqIWu7C8EoZGU/view?usp=sharing) and put it into ```TextReIDNet/data/checkpoints/TextReIDNet_State_Dicts.pth.tar```
-- Read and modify the ```config.py``` to suit your system resources and requirements
+- Navigate into DecentralizedTextReIDNet directory: ```cd /path/to/DecentralizedTextReIDNet```
+- Download the [data](https://drive.google.com/drive/folders/1vGMhKj2hf_Kw286zi_exzX2FMTsISC9E?usp=sharing) folder and place it into as ```DecentralizedTextReIDNet/data```
+- Read and modify the ```config.py``` file in ```DecentralizedTextReIDNet/config.py``` to suit your system resources and requirements
