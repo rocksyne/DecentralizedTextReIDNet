@@ -59,10 +59,10 @@ def list_images_in_directory(directory):
 
 if __name__ == '__main__':
     
-    image_parent_directory = "../data/gallery/all_gallery"
+    image_parent_directory = "../data/sample_gallery"
     image_list = list_images_in_directory(image_parent_directory)
 
-    textual_description = "The woman is wearing a black t-shirt with pink writing. She is wearing khaki shorts and white shoes."
+    textual_description = "The woman has long black hair. She is wearing a pink dress with a white sweater and black shoes."
     
     token_ids, orig_token_length = process_text_into_tokens(textual_description)
     token_ids = token_ids.unsqueeze(0).to(configs.device).long()
