@@ -62,31 +62,15 @@ if __name__ == '__main__':
     image_parent_directory = "../data/gallery/all_gallery"
     image_list = list_images_in_directory(image_parent_directory)
 
-    textual_description = "The man is wearing a black t-shirt with pink writing. He is wearing khaki shorts and white shoes."
+    textual_description = "The woman is wearing a black t-shirt with pink writing. She is wearing khaki shorts and white shoes."
     
-
-    
-
     token_ids, orig_token_length = process_text_into_tokens(textual_description)
     token_ids = token_ids.unsqueeze(0).to(configs.device).long()
     orig_token_length = torch.tensor([orig_token_length]).to(configs.device)
 
-
-    # # torch.save(token_ids,"token_ids.pt")
-    # # torch.save(orig_token_length,'orig_token_length.pt')
-    # token_ids = torch.load("token_ids.pt").to(configs.device).long()
-    # orig_token_length = torch.load('orig_token_length.pt').to(configs.device).long()
-
-    # #token_ids, orig_token_length = process_text_into_tokens(textual_description)
-    # # token_ids = token_ids.unsqueeze(0).to(configs.device).long()
-    # # orig_token_length = torch.tensor([orig_token_length]).to(configs.device)
-
-    start = time.time()
-
     with torch.no_grad():
         textual_embedding = model.target_persons_text_embeddings(token_ids, orig_token_length)
     
-
     ranking_result = []
     for image_path in tqdm(image_list):
         original_img, original_img_as_tensor, processed_img = read_and_process_image(image_path)
@@ -105,6 +89,3 @@ if __name__ == '__main__':
 
     for idx, path in enumerate(sorted_paths_and_scores[:10],start=1):
         print(f"{idx}. Path:{path[0]}  Score:{path[1]}")
-
-    end = time.time()
-    print("Total Time elapsed:",end - start)
