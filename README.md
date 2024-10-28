@@ -1,11 +1,10 @@
 # Decentralized Text-Based Person Re-Identification in Multi-Camera Networks
 This is the code repository for the paper titled **Decentralized Text-Based Person Re-Identification in Multi-Camera Networks**. The repository contains the implementation of U-TextReIDNet and its decentralized deployment in multi-camera networks. The prototype system addresses limitations in scalability, bandwidth usage, and processing bottlenecks typically found in traditional centralized systems by enabling person re-ID directly at the camera node level.
- &nbsp;
 
-![](docs/overall_system_architecture.png)
-Figure 1. The architure of the proposed decentralized system.
- &nbsp;
+<br>
+<img src="docs/overall_system_architecture.png" width="45%">
+The architure of the proposed decentralized system.
 
-![](docs/U-TextReIDNet.png)
- 
-![](docs/results_demo_video.png)
+<br><br>
+<img src="docs/results_demo_video.png" width="100%"><br>
+The screenshot of the prototype system (user application).
