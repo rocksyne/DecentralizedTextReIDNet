@@ -25,10 +25,19 @@ The screenshot of the prototype system (user application). The typos are deliber
 - natsort version: 8.4.0
 - The remaining requirements are specified in [requirements.txt](requirements.txt)
 
-&nbsp;
 ## For Nvidia Jetson Nano
 Download and use the [Ubuntu 20.04 OS image](https://github.com/Qengineering/Jetson-Nano-Ubuntu-20-image) from [Qengineering](https://github.com/Qengineering/Jetson-Nano-Ubuntu-20-image) to setup the operating system on the Jetson Nano device. The libraries provided by the Ubuntu 20.04 OS image should be sufficient, but where neccessary [install the dependencies](requirements.txt). The OS image comes pre-installed with the following:
 - OpenCV 4.8.0
 - Pytorch 1.13.0
 - TorchVision 0.14.0
 - TensorRT 8.0.1.6
+
+
+&nbsp;
+## Setup (dependencies)
+## For Computer (Application Server) 
+- Install dependencies. Complete list of dependencies is in ```requirements.txt```
+- Download or clone DecentralizedTextReIDNet repository
+- Navigate into TextReIDNet directory: ```cd /path/to/TextReIDNet```
+- Download the pre-trained model [TextReIDNet_State_Dicts.pth.tar](https://drive.google.com/file/d/1iGRlscz0Vev_fDLswj_yqIWu7C8EoZGU/view?usp=sharing) and put it into ```TextReIDNet/data/checkpoints/TextReIDNet_State_Dicts.pth.tar```
+- Read and modify the ```config.py``` to suit your system resources and requirements
