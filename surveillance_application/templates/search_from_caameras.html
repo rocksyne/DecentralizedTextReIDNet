@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Person Re-identification System</title>
+  <!-- plugins:css -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendors/feather/feather.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendors/ti-icons/css/themify-icons.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendors/css/vendor.bundle.base.css') }}">
+  <!-- endinject -->
+  <!-- Plugin css for this page -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendors/datatables.net-bs4/dataTables.bootstrap4.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendors/ti-icons/css/themify-icons.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='js/select.dataTables.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendors/mdi/css/materialdesignicons.min.css') }}">
+  <!-- End plugin css for this page -->
+  <!-- inject:css -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/vertical-layout-light/style.css') }}">
+  <!-- endinject -->
+  <link rel="shortcut icon" href="{{ url_for('static', filename='images/logo.png') }}" />
+  <style>
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 10px; /* Adjust the gap as needed */
+    }
+
+    .slider-container label {
+      margin: 0;
+    }
+
+    .slider-container input {
+      flex-grow: 1;
+    }
+
+    .nav-item.active .nav-link {
+      background-color: #e0e0e0; /* Highlight color */
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container-scroller">
+    <!-- partial:partials/_navbar.html -->
+    <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+      <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
+        <a class="navbar-brand brand-logo mr-5" href="/"><img src="{{ url_for('static', filename='images/logo.png') }}" class="mr-2" alt="logo" /></a>
+        <a class="navbar-brand brand-logo-mini" href="/"><img src="{{ url_for('static', filename='images/logo.png') }}" alt="logo" /></a>
+      </div>
+      <div class="navbar-menu-wrapper d-flex align-items-center justify-content-start">
+        Decentralized Text-based Person Re-identification Framework (Version {{app_version}})
+      </div>
+    </nav>
+    <!-- partial -->
+    <div class="container-fluid page-body-wrapper">
+      <!-- partial:partials/_sidebar.html -->
+      <nav class="sidebar sidebar-offcanvas" id="sidebar">
+        <ul class="nav">
+          <li class="nav-item active" id="nav-search-from-cameras">
+            <a class="nav-link" href="/search-from-cameras">
+              <i class="icon-grid menu-icon"></i>
+              <span class="menu-title">Search From Cameras</span>
+            </a>
+          </li>
+
+          <li class="nav-item" id="nav-get-camera-live-view">
+            <a class="nav-link" href="/get-camera-live-view">
+              <i class="icon-camera menu-icon"></i>
+              <span class="menu-title">Get camera live view</span>
+            </a>
+          </li>
+
+          <li class="nav-item" id="nav-logout">
+            <a class="nav-link" href="/logout">
+              <i class="icon-lock menu-icon"></i>
+              <span class="menu-title">Logout</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <!-- partial -->
+      <div class="main-panel">
+        <div class="content-wrapper">
+          <div class="row">
+            <div class="col-md-6 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body d-flex justify-content-center" style="background-color: black;">
+                  <!-- Image at the top of the card -->
+                  <img src="{{ url_for('video_feed') }}" alt="Live Video Feed" class="img-fluid">
+                </div>
+
+                <!-- Horizontal slider -->
+                <div class="card-body">
+                  <div class="slider-container">
+                    <label for="sensitivitySlider">Sensitivity</label>
+                    <input type="range" class="form-range" min="10" max="100" step="1" id="sensitivitySlider" value="{{default_sensitivity*100}}">
+                    <span id="sliderValue">{{default_sensitivity}}</span> <!-- Display the slider value -->
+                  </div>
+                </div>
+
+                <!-- Text field and submit button at the bottom -->
+                <div class="card-body" id="search_progress">
+                  <h5>&nbsp;</h5>
+                </div>
+
+                <div class="card-body">
+                  <form id="textForm">
+                    <div class="form-group">
+                      <input type="text" class="form-control" id="userText" name="user_text" placeholder="Provide the description of the person of interest here.">
+                    </div>
+                    <button type="submit" id="submitButton" class="btn btn-primary">Search Person</button>
+                    <button type="button" id="cancelButton" class="btn btn-danger">Cancel Search</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">Camera Operation Status (filtered by IP Address)</h4>
+                  <div class="table-responsive">
+                    <table class="table table-striped table-borderless">
+                      <thead>
+                        <tr>
+                          <th>Camera Node Name</th>
+                          <th>IP Address</th>
+                          <th>Last Seen</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody id="camera_status_table">
+                        <!-- Content will be filled by JavaScript -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div class="card-body" id="person_search_logs">
+                  <h4 class="card-title">System log for current search operation</h4>
+                  <div class="table-responsive">
+                    <table class="table table-striped table-borderless">
+                      <thead>
+                        <tr>
+                          <th>Date & Time</th>
+                          <th>Target / person location</th>
+                          <th>Confidence</th>
+                        </tr>
+                      </thead>
+                      <tbody id="person_search_logs_table">
+                        <!-- Put the log here -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- content-wrapper ends -->
+        <!-- partial:partials/_footer.html -->
+        <footer class="footer">
+          <div class="d-sm-flex justify-content-center justify-content-sm-between">
+            <span class="text-muted text-left text-sm-left d-block d-sm-inline-block">Copyright © {{current_year}} &#183 
+              <a href="https://nes.aau.at/" target="_blank">Institute of Networked and Embedded Systems (NES)</a> &#183 
+              <a href="https://aau.at/" target="_blank">University of Klagenfurt, Austria</a> &#183
+              
+            </br>Acknowledgement: The free web template (HTML, CSS, JS) was downloaded from <a href="https://aau.at/" target="_blank">https://www.bootstrapdash.com</a>.</span>
+            <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Application Version {{app_version}} </span>
+          </div>
+        </footer>
+        <!-- partial -->
+      </div>
+      <!-- main-panel ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
+  </div>
+  <!-- container-scroller -->
+
+  <!-- File submission JavaScript -->
+  <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+  <!-- plugins:js -->
+  <script src="{{ url_for('static', filename='vendors/js/vendor.bundle.base.js') }}"></script>
+  <!-- endinject -->
+  <!-- Plugin js for this page -->
+  <script src="{{ url_for('static', filename='vendors/chart.js/Chart.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendors/datatables.net/jquery.dataTables.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendors/datatables.net-bs4/dataTables.bootstrap4.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/dataTables.select.min.js') }}"></script>
+
+  <!-- End plugin js for this page -->
+  <!-- inject:js -->
+  <script src="{{ url_for('static', filename='js/off-canvas.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/hoverable-collapse.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/template.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/todolist.js') }}"></script>
+  <!-- endinject -->
+  <!-- Custom js for this page-->
+  <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/Chart.roundedBarCharts.js') }}"></script>
+  <!-- End custom js for this page-->
+
+  <script>
+    $(document).ready(function() {
+      var taskId = null; // This will store the task ID
+
+      // Initially hide the cancel button and enable the text field
+      $('#cancelButton').hide();
+      $('#person_search_logs').hide();
+      $('#userText').prop('disabled', false);
+
+      // Highlight active navigation item
+      function highlightNavItem() {
+        var currentPath = window.location.pathname;
+        $('.nav-item').removeClass('active');
+        if (currentPath === '/search-from-cameras') {
+          $('#nav-search-from-cameras').addClass('active');
+        } else if (currentPath === '/get-camera-live-view') {
+          $('#nav-get-camera-live-view').addClass('active');
+        } else if (currentPath === '/logout') {
+          $('#nav-logout').addClass('active');
+        }
+      }
+
+      // Call the function to highlight the active navigation item
+      highlightNavItem();
+
+      // Update slider value display
+      $('#sensitivitySlider').on('input', function() {
+        $('#sliderValue').text($(this).val()/100);
+      });
+      
+
+      // Send slider value to the Flask server on mouse release
+      $('#sensitivitySlider').on('change', function() {
+        $.ajax({
+          url: '/set-sensitivity',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ sensitivity: $(this).val()/100}),
+          success: function(response) {
+            console.log('Sensitivity set to ' + response.sensitivity);
+          },
+          error: function(error) {
+            console.error('Error setting sensitivity:', error);
+          }
+        });
+      });
+
+      function updateCameraStatus() {
+        $.ajax({
+          url: '/get-camera-status',
+          type: 'GET',
+          success: function(response) {
+            if (response.message && response.data.length === 0) {
+              $('#camera_status_table').html('<tr><td colspan="4" class="text-center">No camera data available</td></tr>');
+            } else {
+              var tableContent = '';
+              response.forEach(function(camera) {
+                var lastSeenFormatted = camera.last_seen;  // Convert Unix timestamp to relative time
+                tableContent += '<tr>' +
+                  '<td>' + camera.camera_name + '</td>' +
+                  '<td>' + camera.ip_address + '</td>' +
+                  '<td>' + lastSeenFormatted + '</td>' +
+                  '<td><label class="badge badge-' + camera.badge + '">' + camera.status + '</label></td>' +
+                  '</tr>';
+              });
+              $('#camera_status_table').html(tableContent);
+            }
+          },
+          error: function(error) {
+            console.error('Error fetching camera status:', error);
+            $('#camera_status_table').html('<tr><td colspan="4" class="text-center">Error loading data. Application may be offline.</td></tr>');
+          }
+        });
+      }
+
+      function updateSearchOperationStatus() {
+        $.ajax({
+          url: '/get-search-operation-status',
+          type: 'GET',
+          success: function(response) {
+            if (response.message && response.data.length === 0) {
+              $('#person_search_logs_table').html('<tr><td colspan="4" class="text-center">No camera data available</td></tr>');
+            } else {
+              var tableContent = '';
+              response.forEach(function(log) {
+                tableContent += '<tr>' +
+                  '<td>' + log.timestamp + '</td>' +
+                  '<td><strong>' + log.camera + '</strong></td>' +
+                  '<td>' + parseFloat(log.score).toFixed(2) + '</td>' +
+                  '</tr>';
+              });
+              $('#person_search_logs_table').html(tableContent);
+            }
+          },
+          error: function(error) {
+            console.error('Error fetching camera status:', error);
+            $('#person_search_logs_table').html('<tr><td colspan="4" class="text-center">Error loading data. Application may be offline.</td></tr>');
+          }
+        });
+      }
+
+      function resetUI() {
+        // Hide cancel button, show search button, enable text field, and hide progress
+        $('#cancelButton').hide();
+        $('#person_search_logs').hide();
+        $('#submitButton').show();
+        $('#userText').prop('disabled', false);
+        $('#search_progress').hide();
+      }
+
+      updateCameraStatus(); // keep the camera operation status smooth
+      setInterval(updateCameraStatus, 1000); // Refresh every 1000 milliseconds or 1 second
+      resetUI();
+
+      $('#textForm').on('submit', function(event) {
+        event.preventDefault();
+        var userText = $('#userText').val().trim();
+
+        // Check if the text field is empty
+        if (userText === "") {
+          alert("Please provide a description of the person you would like to search!"); // I'll replace this with a more elegant notification
+          return; // Stop the function if the text field is empty
+        }
+
+        // Disable the text field, show the cancel button, hide the search button
+        $('#userText').prop('disabled', true);
+        $('#cancelButton').show();
+        $('#submitButton').hide();
+        $('#search_progress').html("<label class='badge badge-info'>Starting search...the first search after application restart can take up to 30 seconds because of file loadings...please wait...</label>").show();
+
+        $.ajax({
+          url: '/search-person',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ user_text: userText }),
+          dataType: 'json',
+          success: function(data) {
+            console.log(data);
+            $('#search_progress').html("<label class='badge badge-warning'>Searching for </label> &nbsp;" + data.text).show();
+            setInterval(updateSearchOperationStatus, 1000);
+            $('#person_search_logs').show();
+          },
+          error: function(error) {
+            console.error('Error:', error);
+            // Reset the UI if there is an error
+            resetUI();
+          }
+        });
+      });
+
+      $('#cancelButton').on('click', function() {
+        $.ajax({
+          url: '/stop-person-search',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ task_id: taskId }),
+          success: function(response) {
+            console.log(response.message);
+            // Reset the UI after cancellation
+            resetUI();
+          },
+          error: function(error) {
+            console.error('Error:', error);
+            // Reset the UI if there is an error
+            resetUI();
+          }
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>
