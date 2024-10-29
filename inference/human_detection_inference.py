@@ -42,7 +42,7 @@ def draw_bounding_box_on_image(image, bounding_boxes):
 
 if __name__ == '__main__':
     
-    img_path = "/media/rockson/Data_drive/Research/DecentralizedTextReIDNet/data/sample_images/Pervasive-Computing_June-2020.jpg"
+    img_path = "../data/sample_images/aau5.jpg"
     original_img, original_img_as_tensor, processed_img = read_and_process_image(img_path)
 
     with torch.no_grad():

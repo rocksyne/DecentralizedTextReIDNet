@@ -117,11 +117,6 @@ def process_frames(camera, token_ids, orig_token_length):
             camera_output = np.array(original)
             camera_output = cv2.cvtColor(camera_output, cv2.COLOR_RGB2BGR)
 
-        # save the frame
-        image_path = os.path.join("..", "data", "extracted_frames","cameraone",f"frame_{frame_counter}.jpg")
-        out.write(camera_output)
-        cv2.imwrite(image_path,camera_output)
-        frame_counter += 1
 
         # you know this >> display
         cv2.imshow('Frame', camera_output)
@@ -132,7 +127,7 @@ def process_frames(camera, token_ids, orig_token_length):
 if __name__ == '__main__':
 
     camera_stream = VideoFileStream(configs=configs,video_path="../data/sample_videos/cameraone.mp4").start() # read the usb camera
-    textual_description = "The man is wearing a red top and black pants."
+    textual_description = "The man is wearing a brown jacket and black pants. He is holding a blue shopping bag."
     token_ids, orig_token_length = process_text_into_tokens(textual_description)
     token_ids = token_ids.unsqueeze(0).to(configs.device).long()
     orig_token_length = torch.tensor([orig_token_length]).to(configs.device)

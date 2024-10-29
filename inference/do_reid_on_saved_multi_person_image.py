@@ -33,16 +33,6 @@ print('[INFO] Total parameters: {} million'.format(sum(p.numel() for p in model.
 print("")
 
 
-# def read_and_process_image(path:str=None):
-#     """Read and pre-process image"""
-#     img = read_image(img_path=path, mode='RGB')
-#     processed_img = rgb_img_resizer(img)
-#     original_img = processed_img.copy()
-#     processed_img = MHPv2_transform(processed_img)
-#     processed_img = processed_img.unsqueeze(0) # make shape (1,3,H,W)
-#     return original_img, processed_img
-
-
 def read_and_process_image(path:str=None):
     """Read and pre-process image"""
     img = read_image(img_path=path, mode='RGB')
@@ -101,10 +91,8 @@ def draw_bounding_boxes(image, bounding_boxes, confidence_scores, top_1=False):
 
 if __name__ == '__main__':
     
-    #img_path = "../data/sample_images/Pervasive-Computing_June-2020.jpg"
-    #textual_description = "The man is wearing a blue long sleeved shirt, black belt, khaki pants and black shoes. He is also wearing eye glasses."
-    img_path = "/home/rockson/Desktop/officerfemalestairs.jpg"
-    textual_description = "The woman is a black long-sleeved shirt, black pants, and black shoes."
+    img_path = "../data/sample_images/aau5.jpg"
+    textual_description = "The man is wearing a grey long-sleeved shirt, brown belt, blue jeans and brown shoes."
    
     original_img, original_img_as_tensor, processed_img = read_and_process_image(img_path)
 
@@ -137,6 +125,3 @@ if __name__ == '__main__':
             original_img = draw_bounding_boxes(original_img,filtered_boxes,filtered_scores,top_1=True)
     
     original_img.show()
-
-
-search_from_multi_person_camera_feed.jpg
