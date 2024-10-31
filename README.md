@@ -23,7 +23,7 @@ The screenshot of the prototype system (user application). The typos are deliber
 - tqdm version: 4.66.1
 - numpy version: 1.26.2
 - natsort version: 8.4.0
-- The remaining requirements are specified in [requirements.txt](requirements.txt)
+- The remaining requirements are specified in [requirements.txt](environment.yml)
 
 ### For Nvidia Jetson Nano
 - OpenCV 4.8.0
@@ -35,7 +35,7 @@ The screenshot of the prototype system (user application). The typos are deliber
 &nbsp;
 ## System Setup
 ### For GPU Computer (Application Server) 
-- Install dependencies. Complete list of dependencies is in ```environment.yaml```
+- Install dependencies. Complete list of dependencies is in ```environment.yml```
 - Download or clone DecentralizedTextReIDNet repository
 - Navigate into DecentralizedTextReIDNet directory: ```cd /path/to/DecentralizedTextReIDNet```
 - Download the [data](https://drive.google.com/drive/folders/1vGMhKj2hf_Kw286zi_exzX2FMTsISC9E?usp=sharing) folder and place it into as ```DecentralizedTextReIDNet/data```
