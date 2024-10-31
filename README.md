@@ -63,3 +63,13 @@ run ```python do_reid_on_saved_pedistrian_video.py```
 
 - Do person detection on multi-person image: <br> 
 run ```python human_detection_inference.py```
+
+&nbsp;
+## Decentralized Person Re-ID
+- Setup the application server and camera node as described in the System Setup section
+- Setup MySQL database system on the application server
+- Create database with name ```decentralized```
+- Use (upload) the database schema from ```DecentralizedTextReIDNet/data/database/decentralized.sql```
+- Install ```Eclipse Mosquitto``` MQTT broker
+- Edit the ```DecentralizedTextReIDNet/config.py``` file and makes changes to the ```Command Station Configuration``` section
+- Start the Application Server applicatition: ```python DecentralizedTextReIDNet/surveillance_application/command_station_app.py ```
