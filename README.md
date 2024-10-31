@@ -74,7 +74,7 @@ run ```python human_detection_inference.py```
 - **On Camera Node (using saved pedesitrian video):** start ```python DecentralizedTextReIDNet/surveillance_application/camera_node_app_video.py``` this plays saved pedistrian video in a loop.
 - **On Camera Node (using webcamera):** start ```python DecentralizedTextReIDNet/surveillance_application/camera_node_app.py```. This uses video feed from the camera.
 
-<br><br>
+<br>
 <img src="docs/results_demo_video.png" width="100%"><br>
 The screenshot of the prototype system (user application) in use. The typos are deliberate. Please see reason in paper.
 
