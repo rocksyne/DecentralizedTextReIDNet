@@ -5,10 +5,6 @@ This is the code repository for the paper titled **Decentralized Text-Based Pers
 <img src="docs/overall_system_architecture.png" width="50%">
 The architecture of the proposed decentralized system.
 
-<br><br>
-<img src="docs/results_demo_video.png" width="100%"><br>
-The screenshot of the prototype system (user application). The typos are deliberate. Please see reason in paper.
-
 
 &nbsp;
 ## Software Dependencies
@@ -71,5 +67,15 @@ run ```python human_detection_inference.py```
 - Create database with name ```decentralized```
 - Use (upload) the database schema from ```DecentralizedTextReIDNet/data/database/decentralized.sql```
 - Install ```Eclipse Mosquitto``` MQTT broker
-- Edit the ```DecentralizedTextReIDNet/config.py``` file and makes changes to the ```Command Station Configuration``` section
-- Start the Application Server applicatition: ```python DecentralizedTextReIDNet/surveillance_application/command_station_app.py ```
+- Edit the ```DecentralizedTextReIDNet/config.py``` file and makes changes to the ```Command Station Configuration``` section. In particular, set the IP address of the application server, eg. ```123.456.789.123```
+- **On Application Server:** start Applicatition Server application: ```python DecentralizedTextReIDNet/surveillance_application/command_station_app.py ```
+- Open a web browser and browse to ```http://123.456.789.123:5001```
+- Log in to application. Default password: aau.at
+- **On Camera Node (using saved pedesitrian video):** start ```python DecentralizedTextReIDNet/surveillance_application/camera_node_app_video.py``` this plays saved pedistrian video in a loop.
+- **On Camera Node (using webcamera):** start ```python DecentralizedTextReIDNet/surveillance_application/camera_node_app.py```. This uses video feed from the camera.
+
+<br><br>
+<img src="docs/results_demo_video.png" width="100%"><br>
+The screenshot of the prototype system (user application) in use. The typos are deliberate. Please see reason in paper.
+
+
