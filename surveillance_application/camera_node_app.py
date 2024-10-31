@@ -221,7 +221,7 @@ def process_video(data_queue, camera_stream, confidence_queue, model, configs, c
             
             elif operation_command == 'stream_live_video':
                 #ret, frame, _, _ = camera_stream.read()
-                original, original_img_as_tensor, preprocessed = camera_stream.read()
+                _, original, original_img_as_tensor, preprocessed = camera_stream.read()
                 if not camera_stream.grabbed:
                     status_code = "CODE404"
                     print("Camera stream broken")
@@ -229,7 +229,7 @@ def process_video(data_queue, camera_stream, confidence_queue, model, configs, c
 
                 if stream_retrieved_video:
                     status_code = "CODE03"
-                    original, original_img_as_tensor, preprocessed = camera_stream.read()
+                    _, original, original_img_as_tensor, preprocessed = camera_stream.read()
                     # timestamp when sending
                     draw = ImageDraw.Draw(original)
                     timestamp = datetime.now().strftime('%H:%M:%S.%f')[:-3]
@@ -268,7 +268,7 @@ def process_video(data_queue, camera_stream, confidence_queue, model, configs, c
                     print("Camera stream broken")
                     continue
                 
-                original, original_img_as_tensor, preprocessed = camera_stream.read()
+                _, original, original_img_as_tensor, preprocessed = camera_stream.read()
                 draw_on_original = ImageDraw.Draw(original)
 
                 # timestamp the image for when captured
@@ -346,8 +346,8 @@ if __name__ == "__main__":
 
     data_queue = queue.Queue()
     confidence_queue = queue.Queue()
-    camera_stream = VideoFileStream(configs=configs, video_path=f"../data/sample_videos/{camera_name}.mp4", loop=True).start()
-    #camera_stream = WebcamVideoStream(configs=configs, frame_rate=30) # read the usb camera
+    #camera_stream = VideoFileStream(configs=configs, video_path=f"../data/sample_videos/{camera_name}.mp4", loop=True).start()
+    camera_stream = WebcamVideoStream(configs=configs, frame_rate=30) # read the usb camera
     sender = ImageSender(connect_to=f"tcp://{configs.command_station_address}:{configs.video_parsing_app_port}")
 
     mqtt_client = setup_mqtt_client(configs)

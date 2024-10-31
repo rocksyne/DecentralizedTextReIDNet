@@ -33,21 +33,35 @@ from utils.camera_stream import WebcamVideoStream
 def on_connect(client, userdata, flags, rc):
     """Handles connection to MQTT broker."""
     print(f"Connected with result code {rc}")
+    client.subscribe("command_station/command")
+    print("Subscribed to command_station/command topic")
+
+
+def on_message(client, userdata, msg):
+    """Handles incoming MQTT messages."""
+    try:
+        message = pickle.loads(msg.payload)
+        command = message.get('command')
+        parameter = message.get('parameter')
+        if isinstance(parameter, list):
+            parameter = [pickle.loads(p) if isinstance(p, bytes) else p for p in parameter]
+        elif isinstance(parameter, str) and command == "set_sensitivity":
+            parameter = float(parameter)  # Convert string back to float
+        elif isinstance(parameter, bytes) and command == "search_person":
+            parameter = pickle.loads(parameter)  # Deserialize the tensor
+        data_queue.put((command, parameter))
+        print(f"Received MQTT message: {command} with parameter: {parameter}")
+    except Exception as e:
+        print(f"Error in on_message: {e}")
+
 
 def setup_mqtt_client(configs):
     """Sets up the MQTT client."""
     client = mqtt.Client()
     client.on_connect = on_connect
+    client.on_message = on_message
     client.connect(configs.command_station_address, 1883, 60)
     return client
-
-def setup_subscriber(address: str) -> tuple:
-    """Sets up a ZMQ subscriber."""
-    context = zmq.Context()
-    socket = context.socket(zmq.SUB)
-    socket.connect(address)
-    socket.setsockopt_string(zmq.SUBSCRIBE, '')  # Subscribe to all messages
-    return context, socket
 
 def thread_target_wrapper(func):
     """Wrapper for thread target functions to handle exceptions."""
@@ -58,33 +72,6 @@ def thread_target_wrapper(func):
             print(f"An error occurred in the thread: {e}")
             traceback.print_exc()
     return wrapped
-
-def receive_message(socket, data_queue: queue.Queue):
-    """Receives messages from ZMQ socket and puts them into the queue."""
-    while True:
-        try:
-            if socket.poll(500):  # Wait for up to 500ms for a message
-                message_parts = socket.recv_multipart()
-
-                if len(message_parts) == 2:
-                    command, parameter = message_parts
-                    command = command.decode('utf-8')
-                    parameter = pickle.loads(parameter)
-
-                    if isinstance(parameter, list):
-                        parameter = [p.decode('utf-8') for p in parameter]
-
-                    data_queue.put((command, parameter))
-
-        except zmq.Again:
-            time.sleep(0.01)
-            continue  # No message received
-        except (pickle.UnpicklingError, zmq.ZMQError) as e:
-            print(f"An error occurred in receive_message(): {e}")
-        except Exception as e:
-            print(f"An unexpected error occurred in receive_message(): {e}")
-            traceback.print_exc()
-            break
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++
 # +++++++++++++[Confidence Score Reporting]++++++++++
@@ -130,22 +117,22 @@ def draw_bounding_boxes(image: Image.Image, bounding_boxes: List[List[int]], con
     draw = ImageDraw.Draw(image)
     confidence_font, camera_name_font, other_stats_font = fonts
     camera_text = f"Person found in {camera_name}"
-    draw.rectangle([0, 25, 512, 90], fill=color)
+    draw.rectangle([0, 5, 512, 55], fill=color)
     left, top, right, bottom = camera_name_font.getbbox(camera_text)
     text_width = right - left
     text_height = bottom - top
     text_x = (512 - text_width) // 2
-    text_y = 25 + ((90 - 25) - text_height) // 2
+    text_y = (55 - text_height) // 2
     draw.text((text_x, text_y), camera_text, font=camera_name_font, fill=(255, 255, 255)) 
 
     # timestamp when the processing was completed
     timestamp = datetime.now().strftime('%H:%M:%S.%f')[:-3]
-    timestamp = f"Frame processed by {camera_name}: {timestamp}"
+    timestamp = f"Processed: {timestamp}"
     left, top, right, bottom = other_stats_font.getbbox(timestamp)
     text_width = right - left
     text_height = bottom - top
-    x = 512 - text_width - 1 # some small padding
-    y = 512 - text_height - 55 # push it to the top
+    x = 512 - text_width - 298 # some small padding
+    y = 512 - text_height - 18 # push it to the top
     draw.text((x, y), timestamp, font=other_stats_font, fill=(255, 255, 255))  # White text
 
     for bbox, score in zip(bounding_boxes, confidence_scores):
@@ -165,9 +152,9 @@ def process_video(data_queue, camera_stream, confidence_queue, model, configs, c
     """Main video processing function."""
     previous_token_ids = torch.zeros((1, 100)).to(configs.device)  # Dummy previous tokens
     textual_embedding = None
-    confidence_font = ImageFont.truetype("arial.ttf", 15) 
-    camera_name_font = ImageFont.truetype("arial.ttf", 30)
-    other_stats_font = ImageFont.truetype("arial.ttf", 20) 
+    confidence_font  = ImageFont.truetype(os.path.join("Fonts","arial.ttf"), 15) 
+    camera_name_font = ImageFont.truetype(os.path.join("Fonts","arial.ttf"), 30)
+    other_stats_font = ImageFont.truetype(os.path.join("Fonts","arial.ttf"), 19) 
     fonts = [confidence_font, camera_name_font, other_stats_font]
     color = tuple(np.random.randint(0, 255, size=3))
     operation_command = None
@@ -233,6 +220,8 @@ def process_video(data_queue, camera_stream, confidence_queue, model, configs, c
                     status_code = "CODE01"
             
             elif operation_command == 'stream_live_video':
+                #ret, frame, _, _ = camera_stream.read()
+                original, original_img_as_tensor, preprocessed = camera_stream.read()
                 if not camera_stream.grabbed:
                     status_code = "CODE404"
                     print("Camera stream broken")
@@ -244,16 +233,34 @@ def process_video(data_queue, camera_stream, confidence_queue, model, configs, c
                     # timestamp when sending
                     draw = ImageDraw.Draw(original)
                     timestamp = datetime.now().strftime('%H:%M:%S.%f')[:-3]
-                    timestamp = f"Frame sent by {camera_name}: {timestamp}"
+                    timestamp = f"Transmitted: {timestamp}"
                     left, top, right, bottom = other_stats_font.getbbox(timestamp)
                     text_width = right - left
                     text_height = bottom - top
                     x = 512 - text_width - 1 # some small padding
-                    y = 512 - text_height - 30 # push it to the top
+                    y = 512 - text_height - 46 # push it to the top
                     draw.text((x, y), timestamp, font=other_stats_font, fill=(255, 255, 255))  # White text
+
+
+                    camera_text = f"Streaming from {camera_name}"
+                    draw.rectangle([0, 5, 512, 55], fill=color)
+                    left, top, right, bottom = camera_name_font.getbbox(camera_text)
+                    text_width = right - left
+                    text_height = bottom - top
+                    text_x = (512 - text_width) // 2
+                    text_y = (55 - text_height) // 2
+                    draw.text((text_x, text_y), camera_text, font=camera_name_font, fill=(255, 255, 255)) 
+
+
+                    
              
                     camera_output = cv2.cvtColor(np.array(original), cv2.COLOR_RGB2BGR)
                     sender.send_image(camera_name, camera_output)
+
+                    # for debugging purposes TODO: clean it
+                    # cv2.imshow('Person Search', camera_output)
+                    # if cv2.waitKey(1) & 0xFF == ord('q'):
+                    #     break
 
             elif operation_command == 'search_person':
                 if not camera_stream.grabbed:
@@ -266,12 +273,12 @@ def process_video(data_queue, camera_stream, confidence_queue, model, configs, c
 
                 # timestamp the image for when captured
                 timestamp = datetime.now().strftime('%H:%M:%S.%f')[:-3]
-                timestamp = f"Frame captured by {camera_name}: {timestamp}"
+                timestamp = f"Captured:   {timestamp}"
                 left, top, right, bottom = other_stats_font.getbbox(timestamp)
                 text_width = right - left
                 text_height = bottom - top
-                x = 512 - text_width - 1 # some small padding
-                y = 512 - text_height - 80 # push it to the top
+                x = 512 - text_width - 300 # some small padding
+                y = 512 - text_height - 40 # push it to the top
                 draw_on_original.text((x, y), timestamp, font=other_stats_font, fill=(255, 255, 255))  # White text
 
 
@@ -299,12 +306,12 @@ def process_video(data_queue, camera_stream, confidence_queue, model, configs, c
                                 # timestamp when sending
                                 draw = ImageDraw.Draw(original_img)
                                 timestamp = datetime.now().strftime('%H:%M:%S.%f')[:-3]
-                                timestamp = f"Frame sent by {camera_name}: {timestamp}"
+                                timestamp = f"Transmitted: {timestamp}"
                                 left, top, right, bottom = other_stats_font.getbbox(timestamp)
                                 text_width = right - left
                                 text_height = bottom - top
                                 x = 512 - text_width - 1 # some small padding
-                                y = 512 - text_height - 29 # push it to the top
+                                y = 512 - text_height - 46 # push it to the top
                                 draw.text((x, y), timestamp, font=other_stats_font, fill=(255, 255, 255))  # White text
 
                                 # send to command station
@@ -339,16 +346,11 @@ if __name__ == "__main__":
 
     data_queue = queue.Queue()
     confidence_queue = queue.Queue()
-    context, subscriber_socket = setup_subscriber(f"tcp://{configs.command_station_address}:{configs.message_parsing_app_port}")
-    #camera_stream = VideoFileStream(configs=configs, video_path=f"../data/sample_videos/{camera_name}.mp4", loop=True).start()
-    camera_stream = WebcamVideoStream(configs=configs,src=0).start() # read the usb camera
+    camera_stream = VideoFileStream(configs=configs, video_path=f"../data/sample_videos/{camera_name}.mp4", loop=True).start()
+    #camera_stream = WebcamVideoStream(configs=configs, frame_rate=30) # read the usb camera
     sender = ImageSender(connect_to=f"tcp://{configs.command_station_address}:{configs.video_parsing_app_port}")
 
     mqtt_client = setup_mqtt_client(configs)
-
-    recv_thread = threading.Thread(target=thread_target_wrapper(receive_message), args=(subscriber_socket, data_queue))
-    recv_thread.daemon = True
-    recv_thread.start()
 
     video_thread = threading.Thread(target=process_video, args=(data_queue, camera_stream, confidence_queue, model, configs, camera_name, top_1))
     video_thread.daemon = True
@@ -358,6 +360,8 @@ if __name__ == "__main__":
     reporting_thread.daemon = True
     reporting_thread.start()
 
+    mqtt_client.loop_start()
+
     try:
         while True:
             mqtt_client.publish(f"camera/status", f"{camera_name}_{camera_ip_address}_{status_code}")
@@ -366,8 +370,7 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("Main program interrupted")
     finally:
-        subscriber_socket.close()
-        context.term()
         camera_stream.stop()
         mqtt_client.disconnect()
+        mqtt_client.loop_stop()
         cv2.destroyAllWindows()

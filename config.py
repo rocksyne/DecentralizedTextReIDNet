@@ -217,7 +217,7 @@ def sys_configuration(platform_name:str=platform.node(), dataset_name:str="CUHK-
     # ++++++++++[Command Station Configuration]++++++++++
     # +++++++++++++++++++++++++++++++++++++++++++++++++++
     configs["app_version"]:str = "1.0.9" # MAJOR.MINOR.PATCH
-    configs["command_station_address"]:str = "xxx.xxx.xxx.xxx" # IP address of the command station computer
+    configs["command_station_address"]:str = "143.205.116.144" # IP address of the command station computer
     configs["command_application_port"]:int = 5000
     configs["message_parsing_app_port"]:str = "5559"
     configs["video_parsing_app_port"]:str = "5558"
