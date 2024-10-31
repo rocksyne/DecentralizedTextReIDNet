@@ -5,10 +5,6 @@ This is the code repository for the paper titled **Decentralized Text-Based Pers
 <img src="docs/overall_system_architecture.png" width="50%">
 The architecture of the proposed decentralized system.
 
-<br><br>
-<img src="docs/results_demo_video.png" width="100%"><br>
-The screenshot of the prototype system (user application). The typos are deliberate. Please see reason in paper.
-
 
 &nbsp;
 ## Software Dependencies
@@ -23,7 +19,7 @@ The screenshot of the prototype system (user application). The typos are deliber
 - tqdm version: 4.66.1
 - numpy version: 1.26.2
 - natsort version: 8.4.0
-- The remaining requirements are specified in [requirements.txt](requirements.txt)
+- The remaining requirements are specified in [requirements.txt](environment.yml)
 
 ### For Nvidia Jetson Nano
 - OpenCV 4.8.0
@@ -35,7 +31,7 @@ The screenshot of the prototype system (user application). The typos are deliber
 &nbsp;
 ## System Setup
 ### For GPU Computer (Application Server) 
-- Install dependencies. Complete list of dependencies is in ```environment.yaml```
+- Install dependencies. Complete list of dependencies is in ```environment.yml```
 - Download or clone DecentralizedTextReIDNet repository
 - Navigate into DecentralizedTextReIDNet directory: ```cd /path/to/DecentralizedTextReIDNet```
 - Download the [data](https://drive.google.com/drive/folders/1vGMhKj2hf_Kw286zi_exzX2FMTsISC9E?usp=sharing) folder and place it into as ```DecentralizedTextReIDNet/data```
@@ -63,3 +59,23 @@ run ```python do_reid_on_saved_pedistrian_video.py```
 
 - Do person detection on multi-person image: <br> 
 run ```python human_detection_inference.py```
+
+&nbsp;
+## Decentralized Person Re-ID
+- Setup the application server and camera node as described in the System Setup section
+- Setup MySQL database system on the application server
+- Create database with name ```decentralized```
+- Use (upload) the database schema from ```DecentralizedTextReIDNet/data/database/decentralized.sql```
+- Install ```Eclipse Mosquitto``` MQTT broker
+- Edit the ```DecentralizedTextReIDNet/config.py``` file and makes changes to the ```Command Station Configuration``` section. In particular, set the IP address of the application server, eg. ```123.456.789.123```
+- **On Application Server:** start Applicatition Server application: ```python DecentralizedTextReIDNet/surveillance_application/command_station_app.py ```
+- Open a web browser and browse to ```http://123.456.789.123:5001```
+- Log in to application. Default password: aau.at
+- **On Camera Node (using saved pedesitrian video):** start ```python DecentralizedTextReIDNet/surveillance_application/camera_node_app_video.py``` this plays saved pedistrian video in a loop.
+- **On Camera Node (using webcamera):** start ```python DecentralizedTextReIDNet/surveillance_application/camera_node_app.py```. This uses video feed from the camera.
+
+<br>
+<img src="docs/results_demo_video.png" width="100%"><br>
+The screenshot of the prototype system (user application) in use. The typos are deliberate. Please see reason in paper.
+
+
