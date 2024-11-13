@@ -19,7 +19,7 @@ The architecture of the proposed decentralized system.
 - tqdm version: 4.66.1
 - numpy version: 1.26.2
 - natsort version: 8.4.0
-- The remaining requirements are specified in [requirements.txt](environment.yml)
+- The remaining requirements are specified in [environment.yml](environment.yml)
 
 ### For Nvidia Jetson Nano
 - OpenCV 4.8.0
