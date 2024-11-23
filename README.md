@@ -76,7 +76,7 @@ run ```python human_detection_inference.py```
 
 <br>
 <img src="docs/results_demo_video.png" width="100%"><br>
-[The video is available here](https://drive.google.com/file/d/10N2jmo8oQbEiFECHcT4EiE0vbT3FbYVQ/view)<br>
+[The video is available here:](https://drive.google.com/file/d/10N2jmo8oQbEiFECHcT4EiE0vbT3FbYVQ/view)<br>
 The screenshot of the prototype system (user application) in use. The typos are deliberate. Please see reason in paper.
 
 
