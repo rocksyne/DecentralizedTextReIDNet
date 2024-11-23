@@ -75,8 +75,9 @@ run ```python human_detection_inference.py```
 - **On Camera Node (using webcamera):** start ```python DecentralizedTextReIDNet/surveillance_application/camera_node_app.py```. This uses video feed from the camera.
 
 <br>
-<img src="docs/results_demo_video.png" width="100%"><br>
+<img src="docs/results_demo_video.png" width="100%">
+The screenshot of the prototype system (user application) in use. The typos are deliberate. Please see reason in paper.<br>
 The video is available here at (https://drive.google.com/file/d/10N2jmo8oQbEiFECHcT4EiE0vbT3FbYVQ/view)<br>
-The screenshot of the prototype system (user application) in use. The typos are deliberate. Please see reason in paper.
+
 
 
